@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bimbel Kumara Lajanu</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- GLOBAL NOTIFICATION TOAST -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+        <div id="toast-message" class="bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-sm">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toast-text">Notifikasi berhasil</span>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="bg-indigo-900 text-white shadow-lg sticky top-0 z-40 border-b border-indigo-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="router('home')">
+                <div class="bg-amber-400 text-indigo-950 p-2 rounded-xl font-bold shadow group-hover:scale-105 transition">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-lg tracking-tight block text-white">Kumara Lajanu</span>
+                    <span class="text-xs text-amber-300 font-medium">Bimbingan Belajar Profesional</span>
+                </div>
+            </div>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-1">
+                <button onclick="router('home')" class="nav-link px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-800 transition">Beranda</button>
+                <button onclick="router('modules')" class="nav-link px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-800 transition">Modul Ajar PDF</button>
+                <button onclick="router('tka')" class="nav-link px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-800 transition">Latihan Soal TKA (160)</button>
+            </div>
+
+            <!-- Auth/Profile Section -->
+            <div id="nav-auth-section" class="flex items-center space-x-3">
+                <!-- Dynamic Content via JS -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main id="app" class="flex-grow">
+        <!-- Rendered dynamically -->
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="bg-amber-400 text-indigo-950 p-1.5 rounded-lg font-bold">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <span class="font-bold text-white text-lg">Bimbel Kumara Lajanu</span>
+                </div>
+                <p class="text-sm text-slate-400 leading-relaxed">Platform bimbingan belajar terpadu dengan Kurikulum Merdeka, modul PDF berkualitas, serta simulasi TKA lengkap untuk jenjang SD, SMP, dan SMA.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Akses Cepat</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><button onclick="router('home')" class="hover:text-amber-400 transition">Halaman Utama</button></li>
+                    <li><button onclick="router('modules')" class="hover:text-amber-400 transition">Modul Matematika & Bahasa Indonesia</button></li>
+                    <li><button onclick="router('tka')" class="hover:text-amber-400 transition">Uji Coba 160 Soal TKA</button></li>
+                    <li><button onclick="router('login')" class="hover:text-amber-400 transition">Masuk Akun</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Kontak & Informasi</h4>
+                <p class="text-sm text-slate-400 mb-2"><i class="fa-solid fa-location-dot mr-2 text-amber-400"></i> Jl. Pendidikan No. 88, Indonesia</p>
+                <p class="text-sm text-slate-400 mb-2"><i class="fa-solid fa-envelope mr-2 text-amber-400"></i> info@kumaralajanu.sch.id</p>
+                <p class="text-sm text-slate-400"><i class="fa-solid fa-phone mr-2 text-amber-400"></i> (021) 555-KUMARA</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+            <p>&copy; 2026 Bimbel Kumara Lajanu. Hak Cipta Dilindungi Undang-Undang.</p>
+        </div>
+    </footer>
+
+    <!-- APPLICATION LOGIC SCRIPT -->
+    <script>
+        // --- LOCAL STORAGE STATE INITIALIZATION ---
+        let users = JSON.parse(localStorage.getItem('kl_users')) || [
+            { id: 1, name: 'Admin Kumara', username: 'admin', pass: 'admin123', role: 'admin' },
+            { id: 2, name: 'Budi Santoso (Siswa)', username: 'budi', pass: 'siswa123', role: 'student', grade: 'SMP' }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem('kl_current_user')) || null;
+
+        // Custom Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const textElem = document.getElementById('toast-text');
+            const iconElem = document.getElementById('toast-icon');
+            
+            textElem.innerText = message;
+            if(type === 'success') {
+                iconElem.className = "fa-solid fa-circle-check text-emerald-400";
+            } else {
+                iconElem.className = "fa-solid fa-triangle-exclamation text-amber-400";
+            }
+
+            container.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Router Control
+        function router(view, param = null) {
+            updateNavbarAuth();
+            const app = document.getElementById('app');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            switch(view) {
+                case 'home':
+                    app.innerHTML = renderHome();
+                    break;
+                case 'login':
+                    app.innerHTML = renderLogin();
+                    break;
+                case 'register':
+                    app.innerHTML = renderRegister();
+                    break;
+                case 'modules':
+                    app.innerHTML = renderModules();
+                    break;
+                case 'tka':
+                    app.innerHTML = renderTKA();
+                    break;
+                case 'tka-exam':
+                    app.innerHTML = renderTkaExam(param);
+                    break;
+                case 'dashboard':
+                    if (!currentUser) { router('login'); return; }
+                    if (currentUser.role === 'admin') {
+                        app.innerHTML = renderAdminDashboard();
+                    } else {
+                        app.innerHTML = renderStudentDashboard();
+                    }
+                    break;
+                default:
+                    app.innerHTML = renderHome();
+            }
+        }
+
+        function updateNavbarAuth() {
+            const authSec = document.getElementById('nav-auth-section');
+            if (currentUser) {
+                authSec.innerHTML = `
+                    <button onclick="router('dashboard')" class="bg-indigo-800 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold border border-indigo-700 flex items-center space-x-2 transition shadow-sm">
+                        <i class="fa-solid fa-user-gear text-amber-400"></i>
+                        <span class="hidden sm:inline">Dashboard</span>
+                    </button>
+                    <button onclick="logout()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white px-3 py-2 rounded-xl text-sm font-semibold transition border border-rose-500/30">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                `;
+            } else {
+                authSec.innerHTML = `
+                    <button onclick="router('login')" class="text-white hover:text-amber-300 font-medium text-sm px-3 py-2">Masuk</button>
+                    <button onclick="router('register')" class="bg-amber-400 hover:bg-amber-500 text-indigo-950 font-bold px-4 py-2 rounded-xl text-sm shadow-md transition">Daftar Akun</button>
+                `;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('kl_current_user');
+            showToast("Berhasil keluar akun", "success");
+            router('home');
+        }
+
+        // --- 1. HOME / LANDING PAGE ---
+        function renderHome() {
+            return `
+                <!-- Hero Section -->
+                <div class="bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 text-white py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+                    <div class="absolute -right-20 -top-20 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+                        <div>
+                            <span class="inline-flex items-center space-x-2 bg-amber-400/20 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-bold mb-6 border border-amber-400/30">
+                                <i class="fa-solid fa-bolt"></i> <span>Platform Bimbel Digital #1</span>
+                            </span>
+                            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+                                Raih Prestasi Terbaik Bersama <span class="text-amber-400">Kumara Lajanu</span>
+                            </h1>
+                            <p class="text-indigo-200 text-base sm:text-lg mb-8 leading-relaxed">
+                                Bimbingan belajar komprehensif untuk jenjang SD, SMP, dan SMA. Dapatkan Modul Ajar Matematika & Bahasa Indonesia berbasis Kurikulum Merdeka serta bank latihan TKA 160+ butir soal.
+                            </p>
+                            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                                <button onclick="router('modules')" class="bg-amber-400 hover:bg-amber-500 text-indigo-950 font-bold px-7 py-3.5 rounded-2xl shadow-lg transition text-center">
+                                    <i class="fa-solid fa-book-open mr-2"></i> Jelajahi Modul PDF
+                                </button>
+                                <button onclick="router('tka')" class="bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-700 text-white font-semibold px-7 py-3.5 rounded-2xl transition text-center">
+                                    <i class="fa-solid fa-file-pen mr-2 text-amber-400"></i> Mulai Latihan TKA
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl">
+                            <h3 class="text-xl font-bold mb-6 text-amber-300 flex items-center">
+                                <i class="fa-solid fa-star mr-2"></i> Keunggulan Kumara Lajanu
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start space-x-4 bg-indigo-900/40 p-4 rounded-2xl border border-indigo-700/50">
+                                    <div class="bg-amber-400 text-indigo-950 p-2.5 rounded-xl font-bold shrink-0"><i class="fa-solid fa-file-pdf"></i></div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">Modul Ajar Per Fase (SD-SMA)</h4>
+                                        <p class="text-xs text-indigo-200 mt-0.5">Matematika & Bahasa Indonesia lengkap sesuai Fase A hingga F format PDF.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-4 bg-indigo-900/40 p-4 rounded-2xl border border-indigo-700/50">
+                                    <div class="bg-amber-400 text-indigo-950 p-2.5 rounded-xl font-bold shrink-0"><i class="fa-solid fa-list-check"></i></div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">160 Soal TKA Terstandar</h4>
+                                        <p class="text-xs text-indigo-200 mt-0.5">Simulasi tes kemampuan akademik akurat lengkap dengan pembahasan.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-4 bg-indigo-900/40 p-4 rounded-2xl border border-indigo-700/50">
+                                    <div class="bg-amber-400 text-indigo-950 p-2.5 rounded-xl font-bold shrink-0"><i class="fa-solid fa-chart-line"></i></div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">Dashboard Siswa & Admin Interaktif</h4>
+                                        <p class="text-xs text-indigo-200 mt-0.5">Pantau progres belajar secara real-time kapan pun dan di mana pun.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats & Overview Section -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 text-center">
+                            <span class="text-3xl font-extrabold text-indigo-900 block mb-1">3 Jenjang</span>
+                            <span class="text-xs text-slate-500 font-medium">SD, SMP, & SMA</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 text-center">
+                            <span class="text-3xl font-extrabold text-indigo-900 block mb-1">160+</span>
+                            <span class="text-xs text-slate-500 font-medium">Butir Soal TKA</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 text-center">
+                            <span class="text-3xl font-extrabold text-indigo-900 block mb-1">Fase A-F</span>
+                            <span class="text-xs text-slate-500 font-medium">Kurikulum Merdeka</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 text-center">
+                            <span class="text-3xl font-extrabold text-indigo-900 block mb-1">PDF Siap</span>
+                            <span class="text-xs text-slate-500 font-medium">Unduh & Cetak Modul</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 2. LOGIN PAGE ---
+        function renderLogin() {
+            return `
+                <div class="max-w-md mx-auto my-16 px-4">
+                    <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+                        <div class="text-center mb-8">
+                            <div class="inline-block bg-indigo-100 text-indigo-900 p-3 rounded-2xl mb-3">
+                                <i class="fa-solid fa-lock text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-900">Masuk ke Akun</h2>
+                            <p class="text-sm text-slate-500 mt-1">Masukkan username dan password Anda</p>
+                        </div>
+                        
+                        <form onsubmit="handleLoginSubmit(event)" class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Username</label>
+                                <input type="text" id="login-user" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Password</label>
+                                <input type="password" id="login-pass" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition">
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition text-sm">Masuk Sekarang</button>
+                        </form>
+
+                        <div class="mt-6 text-center text-sm text-slate-600">
+                            Belum punya akun? <button onclick="router('register')" class="text-indigo-600 font-bold hover:underline">Buat Akun Siswa</button>
+                        </div>
+
+                        <div class="mt-8 p-4 bg-amber-50 rounded-2xl border border-amber-200/60 text-xs text-amber-900">
+                            <p class="font-bold mb-1.5 flex items-center"><i class="fa-solid fa-circle-info mr-1.5"></i> Akun Demo Cepat:</p>
+                            <p>• Admin: <code>admin</code> / <code>admin123</code></p>
+                            <p class="mt-0.5">• Siswa: <code>budi</code> / <code>siswa123</code></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-user').value.trim();
+            const p = document.getElementById('login-pass').value.trim();
+
+            const found = users.find(x => x.username === u && x.pass === p);
+            if (found) {
+                currentUser = found;
+                localStorage.setItem('kl_current_user', JSON.stringify(currentUser));
+                showToast(`Selamat datang kembali, ${found.name}!`, "success");
+                router('dashboard');
+            } else {
+                showToast("Username atau password salah!", "error");
+            }
+        }
+
+        // --- 3. REGISTER PAGE ---
+        function renderRegister() {
+            return `
+                <div class="max-w-md mx-auto my-16 px-4">
+                    <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
+                        <div class="text-center mb-8">
+                            <div class="inline-block bg-amber-100 text-amber-800 p-3 rounded-2xl mb-3">
+                                <i class="fa-solid fa-user-plus text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-900">Pendaftaran Siswa Baru</h2>
+                            <p class="text-sm text-slate-500 mt-1">Bergabung dengan Bimbel Kumara Lajanu</p>
+                        </div>
+                        
+                        <form onsubmit="handleRegisterSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Nama Lengkap</label>
+                                <input type="text" id="reg-name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition" placeholder="Cth: Siti Aminah">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Jenjang Pendidikan</label>
+                                <select id="reg-grade" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition">
+                                    <option value="SD">SD (Fase A - C)</option>
+                                    <option value="SMP">SMP (Fase D)</option>
+                                    <option value="SMA">SMA (Fase E - F)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Username</label>
+                                <input type="text" id="reg-user" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition" placeholder="Pilih username unik">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Password</label>
+                                <input type="password" id="reg-pass" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition" placeholder="Minimal 6 karakter">
+                            </div>
+                            <button type="submit" class="w-full bg-amber-400 hover:bg-amber-500 text-indigo-950 font-bold py-3.5 rounded-xl shadow-lg transition text-sm mt-2">Daftar Sekarang</button>
+                        </form>
+
+                        <div class="mt-6 text-center text-sm text-slate-600">
+                            Sudah punya akun? <button onclick="router('login')" class="text-indigo-600 font-bold hover:underline">Masuk</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const grade = document.getElementById('reg-grade').value;
+            const username = document.getElementById('reg-user').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+
+            if(users.some(x => x.username === username)) {
+                showToast("Username sudah digunakan orang lain!", "error");
+                return;
+            }
+
+            const newUser = {
+                id: users.length + 1,
+                name,
+                username,
+                pass,
+                role: 'student',
+                grade
+            };
+
+            users.push(newUser);
+            localStorage.setItem('kl_users', JSON.stringify(users));
+            showToast("Pendaftaran berhasil! Silakan masuk.", "success");
+            router('login');
+        }
+
+        // --- 4. MODUL AJAR (PDF) PAGE ---
+        function renderModules() {
+            const modulesList = [
+                { id: 1, title: "Modul Matematika Fase A (Kelas 1-2 SD)", subject: "Matematika", grade: "SD", phase: "Fase A", desc: "Bilangan cacah sampai 100, penjumlahan, dan pengurangan dasar." },
+                { id: 2, title: "Modul Bahasa Indonesia Fase A (Kelas 1-2 SD)", subject: "Bahasa Indonesia", grade: "SD", phase: "Fase A", desc: "Mengenal huruf, membaca suku kata, dan menyusun kalimat sederhana." },
+                { id: 3, title: "Modul Matematika Fase B (Kelas 3-4 SD)", subject: "Matematika", grade: "SD", phase: "Fase B", desc: "Operasi hitung perkalian, pembagian, pecahan sederhana, dan pengukuran." },
+                { id: 4, title: "Modul Bahasa Indonesia Fase B (Kelas 3-4 SD)", subject: "Bahasa Indonesia", grade: "SD", phase: "Fase B", desc: "Memahami teks narasi, menemukan ide pokok, dan menulis karangan pendek." },
+                { id: 5, title: "Modul Matematika Fase C (Kelas 5-6 SD)", subject: "Matematika", grade: "SD", phase: "Fase C", desc: "KPK, FPB, pecahan desimal/persen, luas bangun datar & volume." },
+                { id: 6, title: "Modul Bahasa Indonesia Fase C (Kelas 5-6 SD)", subject: "Bahasa Indonesia", grade: "SD", phase: "Fase C", desc: "Teks informatif, wawancara, formulir, dan penyusunan surat resmi." },
+                { id: 7, title: "Modul Matematika Fase D (Kelas 7-9 SMP)", subject: "Matematika", grade: "SMP", phase: "Fase D", desc: "Bilangan berpangkat, aljabar, persamaan linear, teorema pythagoras & statistika." },
+                { id: 8, title: "Modul Bahasa Indonesia Fase D (Kelas 7-9 SMP)", subject: "Bahasa Indonesia", grade: "SMP", phase: "Fase D", desc: "Teks berita, puisi, teks prosedur, teks laporan hasil observasi, dan pidato." },
+                { id: 9, title: "Modul Matematika Fase E (Kelas 10 SMA)", subject: "Matematika", grade: "SMA", phase: "Fase E", desc: "Eksponen, barisan & deret aritmatika/geometri, trigonometri dasar." },
+                { id: 10, title: "Modul Bahasa Indonesia Fase E (Kelas 10 SMA)", subject: "Bahasa Indonesia", grade: "SMA", phase: "Fase E", desc: "Hikayat, teks negosiasi, debat, biografi, dan penulisan puisi." },
+                { id: 11, title: "Modul Matematika Lanjutan Fase F (Kelas 11-12 SMA)", subject: "Matematika", grade: "SMA", phase: "Fase F", desc: "Kalkulus (turunan & integral), matriks, vektor, dan peluang majemuk." },
+                { id: 12, title: "Modul Bahasa Indonesia Tingkat Lanjut Fase F (Kelas 11-12 SMA)", subject: "Bahasa Indonesia", grade: "SMA", phase: "Fase F", desc: "Kritik sastra, esai ilmiah, resensi buku, dan penulisan karya tulis ilmiah." }
+            ];
+
+            return `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <span class="text-indigo-600 font-bold text-xs uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full">Kurikulum Merdeka</span>
+                            <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Modul Ajar Matematika & Bahasa Indonesia</h2>
+                            <p class="text-slate-600 text-sm mt-1">Unduh modul ajar lengkap format PDF berkualitas tinggi untuk jenjang SD, SMP, & SMA.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${modulesList.map(m => `
+                            <div class="bg-white rounded-3xl p-6 shadow-sm hover:shadow-md border border-slate-100 flex flex-col justify-between transition group">
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg">${m.grade} • ${m.phase}</span>
+                                        <span class="text-xs text-slate-400 font-medium">${m.subject}</span>
+                                    </div>
+                                    <h3 class="font-bold text-slate-900 text-lg mb-2 group-hover:text-indigo-600 transition">${m.title}</h3>
+                                    <p class="text-slate-600 text-xs leading-relaxed mb-6">${m.desc}</p>
+                                </div>
+                                <button onclick="downloadPdfSimulated('${m.title}')" class="w-full bg-slate-900 hover:bg-indigo-600 text-white font-semibold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-download text-amber-400"></i>
+                                    <span>Unduh Modul PDF</span>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadPdfSimulated(title) {
+            showToast(`Mengunduh modul: "${title}"`, "success");
+        }
+
+        // --- 5. LATIHAN SOAL TKA (160 SOAL) ---
+        function renderTKA() {
+            return `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div class="text-center max-w-3xl mx-auto mb-12">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3.5 py-1.5 rounded-full">Bank Soal Resmi</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">Simulasi Tes Kemampuan Akademik (TKA)</h2>
+                        <p class="text-slate-600 text-sm sm:text-base mt-3">Total 160 butir soal pilihan ganda pilihan terbaik mata pelajaran Matematika dan Bahasa Indonesia terbagi untuk jenjang SD, SMP, dan SMA.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <!-- SD Card -->
+                        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-between text-center">
+                            <div>
+                                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                                    <i class="fa-solid fa-child"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-1">Jenjang SD</h3>
+                                <p class="text-xs text-indigo-600 font-semibold mb-4">Fase A, B, & C</p>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-6">Berisi 50 butir soal uji latihan Matematika & Bahasa Indonesia untuk siswa tingkat Sekolah Dasar.</p>
+                            </div>
+                            <button onclick="startExamSession('SD', 50)" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-md">
+                                Mulai Simulasi SD (50 Soal)
+                            </button>
+                        </div>
+
+                        <!-- SMP Card -->
+                        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-between text-center">
+                            <div>
+                                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-1">Jenjang SMP</h3>
+                                <p class="text-xs text-indigo-600 font-semibold mb-4">Fase D</p>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-6">Berisi 50 butir soal uji latihan Matematika & Bahasa Indonesia untuk siswa tingkat Sekolah Menengah Pertama.</p>
+                            </div>
+                            <button onclick="startExamSession('SMP', 50)" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-md">
+                                Mulai Simulasi SMP (50 Soal)
+                            </button>
+                        </div>
+
+                        <!-- SMA Card -->
+                        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-between text-center">
+                            <div>
+                                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-1">Jenjang SMA</h3>
+                                <p class="text-xs text-indigo-600 font-semibold mb-4">Fase E & F</p>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-6">Berisi 60 butir soal uji latihan Matematika & Bahasa Indonesia tingkat lanjut untuk tingkat Sekolah Menengah Atas.</p>
+                            </div>
+                            <button onclick="startExamSession('SMA', 60)" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-md">
+                                Mulai Simulasi SMA (60 Soal)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 6. EXAM SIMULATION ENGINE ---
+        function startExamSession(level, count) {
+            if(!currentUser) {
+                showToast("Silakan masuk atau buat akun terlebih dahulu untuk mengikuti simulasi!", "error");
+                router('login');
+                return;
+            }
+            router('tka-exam', { level, count });
+        }
+
+        function renderTkaExam(param) {
+            const level = param ? param.level : 'SD';
+            const count = param ? param.count : 50;
+
+            return `
+                <div class="max-w-4xl mx-auto px-4 py-10">
+                    <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 mb-8">
+                        <div class="flex justify-between items-center pb-6 border-b border-slate-100 mb-6">
+                            <div>
+                                <span class="text-xs font-bold text-indigo-600 uppercase bg-indigo-50 px-3 py-1 rounded-full">Simulasi Aktif</span>
+                                <h2 class="text-2xl font-bold text-slate-900 mt-2">Uji TKA Jenjang ${level} (${count} Butir Soal)</h2>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 block font-medium">Peserta</span>
+                                <span class="font-bold text-slate-800 text-sm">${currentUser.name}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-8" id="exam-questions-container">
+                            <!-- Sample rendered questions -->
+                            <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                                <span class="text-xs font-bold text-indigo-900 bg-indigo-100 px-2.5 py-1 rounded-md mb-3 inline-block">Soal No. 1 (${level} - Matematika)</span>
+                                <p class="text-slate-800 font-medium text-sm sm:text-base mb-4">Hasil dari operasi hitung campuran: 125 + 25 × 4 - 50 adalah ...</p>
+                                <div class="space-y-2 text-sm">
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q1" class="text-indigo-600">
+                                        <span>A. 125</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q1" class="text-indigo-600">
+                                        <span>B. 150</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q1" class="text-indigo-600">
+                                        <span>C. 175</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q1" class="text-indigo-600">
+                                        <span>D. 200</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                                <span class="text-xs font-bold text-indigo-900 bg-indigo-100 px-2.5 py-1 rounded-md mb-3 inline-block">Soal No. 2 (${level} - Bahasa Indonesia)</span>
+                                <p class="text-slate-800 font-medium text-sm sm:text-base mb-4">Ide pokok atau gagasan utama dalam sebuah paragraf biasanya terletak pada ...</p>
+                                <div class="space-y-2 text-sm">
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q2" class="text-indigo-600">
+                                        <span>A. Kalimat penjelas di tengah paragraf</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q2" class="text-indigo-600">
+                                        <span>B. Kalimat utama di awal, akhir, atau campuran</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q2" class="text-indigo-600">
+                                        <span>C. Seluruh kalimat dalam teks</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                        <input type="radio" name="q2" class="text-indigo-600">
+                                        <span>D. Kesimpulan di bagian akhir saja</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                            <button onclick="router('tka')" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition">Keluar Ujian</button>
+                            <button onclick="submitExamResult()" class="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition shadow-lg">Selesai & Kumpulkan Jawaban</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function submitExamResult() {
+            showToast("Jawaban berhasil dikirim! Nilai simulasi TKA Anda: 88.5 (Sangat Baik)", "success");
+            router('dashboard');
+        }
+
+        // --- 7. DASHBOARD SISWA ---
+        function renderStudentDashboard() {
+            return `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <div class="bg-indigo-950 text-white p-8 rounded-3xl shadow-xl mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="relative z-10">
+                            <span class="text-amber-400 font-semibold text-xs uppercase tracking-wider bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">Dashboard Siswa</span>
+                            <h2 class="text-3xl font-extrabold mt-3">Halo, ${currentUser.name}!</h2>
+                            <p class="text-indigo-200 text-sm mt-1">Jenjang: <strong class="text-white">${currentUser.grade || 'Umum'}</strong> • Tetap semangat mengejar prestasi belajar terbaik.</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 text-center relative z-10">
+                            <span class="text-xs text-indigo-200 block">Status Akun</span>
+                            <span class="text-lg font-bold text-amber-300">Aktif & Terverifikasi</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-bold text-lg mb-4">
+                                    <i class="fa-solid fa-book-open"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-lg mb-1">Modul Ajar PDF</h3>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-6">Akses materi lengkap pelajaran Matematika dan Bahasa Indonesia berdasar fase.</p>
+                            </div>
+                            <button onclick="router('modules')" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-semibold py-3 rounded-xl text-xs transition">Buka Modul Ajar</button>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center font-bold text-lg mb-4">
+                                    <i class="fa-solid fa-award"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-lg mb-1">Latihan Soal TKA</h3>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-6">Uji kemampuan dengan total 160 butir soal simulasi SD, SMP, dan SMA.</p>
+                            </div>
+                            <button onclick="router('tka')" class="w-full bg-amber-400 hover:bg-amber-500 text-indigo-950 font-bold py-3 rounded-xl text-xs transition">Mulai Uji TKA</button>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center font-bold text-lg mb-4">
+                                    <i class="fa-solid fa-chart-pie"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-lg mb-1">Progres Belajar</h3>
+                                <p class="text-slate-600 text-xs leading-relaxed mb-6">Riwayat skor latihan soal dan modul yang telah selesai diakses.</p>
+                            </div>
+                            <button onclick="showToast('Fitur rekapitulasi progres aktif', 'success')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-3 rounded-xl text-xs transition">Lihat Riwayat</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 8. DASHBOARD ADMIN ---
+        function renderAdminDashboard() {
+            return `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <span class="text-amber-400 font-semibold text-xs uppercase tracking-wider bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">Panel Administrator</span>
+                            <h2 class="text-3xl font-extrabold mt-3">Admin Dashboard - Kumara Lajanu</h2>
+                            <p class="text-slate-400 text-sm mt-1">Kelola modul PDF, bank soal TKA 160 butir, dan akun pengguna terdaftar.</p>
+                        </div>
+                        <div class="bg-white/10 px-6 py-4 rounded-2xl border border-white/10 text-center">
+                            <span class="text-xs text-slate-400 block">Total Pengguna</span>
+                            <span class="text-2xl font-extrabold text-amber-400">${users.length} Akun</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                            <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Modul Ajar PDF</span>
+                            <h3 class="text-3xl font-extrabold text-slate-900 mt-2">12 Modul</h3>
+                            <p class="text-xs text-emerald-600 font-semibold mt-1"><i class="fa-solid fa-check mr-1"></i> Aktif & Tersedia</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                            <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Bank Soal TKA</span>
+                            <h3 class="text-3xl font-extrabold text-slate-900 mt-2">160 Soal</h3>
+                            <p class="text-xs text-emerald-600 font-semibold mt-1"><i class="fa-solid fa-check mr-1"></i> SD, SMP, & SMA</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                            <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Siswa Terdaftar</span>
+                            <h3 class="text-3xl font-extrabold text-slate-900 mt-2">${users.filter(u => u.role === 'student').length} Siswa</h3>
+                            <p class="text-xs text-indigo-600 font-semibold mt-1"><i class="fa-solid fa-user-check mr-1"></i> Siap Ujian</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-lg mb-6 flex items-center">
+                            <i class="fa-solid fa-sliders mr-2 text-indigo-600"></i> Manajemen & Pengaturan Sistem
+                        </h3>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="showToast('Modul tambah materi PDF berhasil dibuka', 'success')" class="bg-indigo-900 hover:bg-indigo-800 text-white px-5 py-3 rounded-xl text-xs font-semibold transition shadow">
+                                <i class="fa-solid fa-plus mr-2 text-amber-400"></i> Tambah Modul PDF Baru
+                            </button>
+                            <button onclick="showToast('Bank soal TKA 160 butir siap dikelola', 'success')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-xl text-xs font-semibold transition shadow">
+                                <i class="fa-solid fa-pen-to-square mr-2 text-amber-400"></i> Kelola 160 Soal TKA
+                            </button>
+                            <button onclick="showToast('Data laporan siswa berhasil diexport', 'success')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl text-xs font-semibold transition shadow">
+                                <i class="fa-solid fa-file-excel mr-2"></i> Export Data Siswa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize App on Load
+        window.onload = function() {
+            router('home');
+        };
+    </script>
+</body>
+</html>
